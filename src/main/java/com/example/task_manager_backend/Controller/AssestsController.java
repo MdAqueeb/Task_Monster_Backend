@@ -7,6 +7,7 @@ import com.example.task_manager_backend.Service.AssestsService;
 
 @RestController
 public class AssestsController {
+    
     @Autowired
     private AssestsService assestsService;
 }

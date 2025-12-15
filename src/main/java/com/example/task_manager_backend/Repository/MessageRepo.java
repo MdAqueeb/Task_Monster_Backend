@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.example.task_manager_backend.Entities.Messages;
 
 @Repository
-public interface MessageRepo extends JpaRepository<Long, Messages> {
+public interface MessageRepo extends JpaRepository<Messages, Long> {
     
 }
