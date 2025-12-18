@@ -1,6 +1,11 @@
 package com.example.task_manager_backend.Entities;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 
 // import org.antlr.v4.runtime.misc.NotNull;
 
@@ -43,23 +48,32 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String profilePic;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true , fetch = FetchType.LAZY)
+    private List<Tasks> tasks = new ArrayList<>();
+
     // Team member 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<TeamMember> teamMembers;
+    @JsonIgnore
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true , fetch = FetchType.LAZY)
+    private List<TeamMember> teamMembers = new ArrayList<>();
 
     // Notification 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Notifications> userNotifications;
+    @JsonIgnore
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    private List<Notifications> userNotifications = new ArrayList<>();
 
     // Messages 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Messages> userMessages;
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Messages> userMessages = new ArrayList<>();
 
     // Assests 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Assests> userAssests;
+    private List<Assests> userAssests = new ArrayList<>();
     // subtask 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Sub_Task> userSubTask;
+    private List<Sub_Task> userSubTask = new ArrayList<>();
     
 }

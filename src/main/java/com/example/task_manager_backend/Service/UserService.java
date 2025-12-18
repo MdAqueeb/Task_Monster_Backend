@@ -1,45 +1,77 @@
 package com.example.task_manager_backend.Service;
 
+// import org.springdoc.core.converters.models.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 // import com.example.task_manager_backend.Controller.List;
-import java.util.List;
+// import java.util.List;
+import java.util.Optional;
+
 import com.example.task_manager_backend.Entities.User;
 import com.example.task_manager_backend.Repository.UsersRepo;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UserService {
     @Autowired
     private UsersRepo userRepo;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public User addNewUser(User user) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addNewUser'");
+        // System.out.println(user.getPassword()+" This is password");
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepo.save(user);
     }
 
     public User updateUser(Long id, User user) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateUser'");
+        Optional<User> usr = userRepo.findById(id);
+        if(!usr.isPresent()){
+            throw new EntityNotFoundException("User not Found");
+        }
+        User users = usr.get();
+        users.setProfilePic(user.getProfilePic());
+        users.setUsername(user.getUsername());
+        users.setEmail(user.getEmail());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepo.save(users);
     }
 
     public User getUser(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUser'");
+        Optional<User> usr = userRepo.findById(id);
+        if(!usr.isPresent()){
+            throw new EntityNotFoundException("User not Found");
+        }
+        return usr.get();
     }
 
     public User updateUserPassword(Long id, String password) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateUserPassword'");
+        Optional<User> usr = userRepo.findById(id);
+        if(!usr.isPresent()){
+            throw new EntityNotFoundException("User not Found");
+        }
+        User user = usr.get();
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepo.save(user);
     }
 
     public User updateUserProfilePic(Long id, String profilePic) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateUserProfilePic'");
+        Optional<User> usr = userRepo.findById(id);
+        if(!usr.isPresent()){
+            throw new EntityNotFoundException("User not Found");
+        }
+        User user = usr.get();
+        user.setProfilePic(profilePic);
+        return userRepo.save(user);
     }
 
-    public List<User> getAllUsers() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllUsers'");
+    public Page<User> getAllUsers(int page, int size) {
+        PageRequest pages = PageRequest.of(page, size);
+        return userRepo.findAll(pages);
     }
 }

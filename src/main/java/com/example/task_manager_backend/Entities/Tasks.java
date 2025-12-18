@@ -4,6 +4,10 @@ package com.example.task_manager_backend.Entities;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
+
 // import org.hibernate.type.descriptor.jdbc.LocalDateTimeJdbcType;
 
 import jakarta.persistence.Column;
@@ -13,7 +17,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +33,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "task")
 public class Tasks {
 
     @Id
@@ -44,45 +53,62 @@ public class Tasks {
     private TaskLevel taskLevel = TaskLevel.LOW;
 
     @Enumerated(EnumType.STRING)
-    @Builder.Default
+    // @Builder.Default
     @Column(name = "task_status", nullable = false)
-    private TaskStatus taskStatus = TaskStatus.TODO;
+    private TaskStatus taskStatus ;
 
     @Enumerated(EnumType.STRING)
-    @Builder.Default
+    // @Builder.Default
     @Column(name = "task_trash", nullable = false)
-    private Trash trash = Trash.NOTTRASH;
+    private Trash trash;
     @Column(name = "created_at", nullable = false, columnDefinition = "DATETIME")
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
+    // @Builder.Default
+    private LocalDateTime createdAt;
     @Column(name = "due_at", columnDefinition = "DATETIME")
     private LocalDateTime dueAt;
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "userid", nullable = false)
+    private User user;
 
-    enum TaskLevel{
+    public enum TaskLevel{
         LOW, MEDIUM, HIGH
     }
 
-    enum TaskStatus{
+    public enum TaskStatus{
         TODO, INPROGRESS, COMPLETED, OVERDUE
     }
 
-    enum Trash {
+    public enum Trash {
         TRASH, NOTTRASH
     }
 
     // messages 
-    @OneToMany(mappedBy = "task")
+    @JsonIgnore
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Messages> taskMessage;
     //subtask
-    @OneToMany(mappedBy = "task")
+    @JsonIgnore
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sub_Task> taskSubTask;
     //assests 
-    @OneToMany(mappedBy = "task")
+    @JsonIgnore
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Assests> taskAssests;
     // notification 
+    @JsonIgnore
     @OneToMany(mappedBy = "task")
     private List<Notifications> taskNotification;
     // team member
-    @OneToMany(mappedBy = "task")
+    @JsonIgnore
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamMember> taskTeamMembers;
+
+
+    @PrePersist
+    void oncreate(){
+        createdAt = LocalDateTime.now();
+        trash = Trash.NOTTRASH;
+        taskStatus = TaskStatus.TODO;
+    }
 }
