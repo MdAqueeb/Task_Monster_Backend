@@ -2,6 +2,8 @@ package com.example.task_manager_backend.Controller;
 
 import java.util.List;
 
+import javax.security.auth.login.FailedLoginException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -9,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.task_manager_backend.DTO.LoginDetails;
+import com.example.task_manager_backend.DTO.UpdatePassword;
 import com.example.task_manager_backend.Entities.User;
 import com.example.task_manager_backend.Service.UserService;
 
@@ -48,10 +52,11 @@ public class UserController {
         }
         
         // - update password 
-        @PatchMapping("/{userid}/update/password")
+        @PostMapping("update/password")
         @Operation(summary = "Update old password to new password")
-        public ResponseEntity<User> updatePassword(@PathVariable Long userid, @RequestParam String password) {
-            User updatedUser = userService.updateUserPassword(userid, password);
+        public ResponseEntity<User> updatePassword(@Valid @RequestBody UpdatePassword password) {
+            System.out.println("Yes it is come here");
+            User updatedUser = userService.updateUserPassword(password);
             if(updatedUser == null){
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -101,5 +106,19 @@ public class UserController {
             return new ResponseEntity<>(usr,HttpStatus.OK);
         }
         
+        @PostMapping("/login")
+        @Operation(summary = "Authentication details validation")
+        public ResponseEntity<User> userValidation(@Valid @RequestBody LoginDetails details) throws FailedLoginException{
+            User usr = userService.validateUser(details);
+            
+            return new ResponseEntity<>(usr,HttpStatus.OK);
+        }
+
+        @PostMapping("/verifyEmail") 
+        @Operation(summary = "Authentication details validation")
+        public ResponseEntity<User> emailVerification(@RequestParam String email){
+            User usr = userService.verifyEmail(email);
+            return new ResponseEntity<>(usr,HttpStatus.OK);
+        }
 
 }

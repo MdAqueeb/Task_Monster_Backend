@@ -11,10 +11,15 @@ import org.springframework.stereotype.Service;
 // import java.util.List;
 import java.util.Optional;
 
+import javax.security.auth.login.FailedLoginException;
+
+import com.example.task_manager_backend.DTO.LoginDetails;
+import com.example.task_manager_backend.DTO.UpdatePassword;
 import com.example.task_manager_backend.Entities.User;
 import com.example.task_manager_backend.Repository.UsersRepo;
 
 import jakarta.persistence.EntityNotFoundException;
+// import jakarta.validation.Valid;
 
 @Service
 public class UserService {
@@ -25,6 +30,10 @@ public class UserService {
 
     public User addNewUser(User user) {
         // System.out.println(user.getPassword()+" This is password");
+        User usr = userRepo.findByEmail(user.getEmail());
+        if(usr != null){
+            throw new IllegalStateException("User already present");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepo.save(user);
     }
@@ -50,14 +59,18 @@ public class UserService {
         return usr.get();
     }
 
-    public User updateUserPassword(Long id, String password) {
-        Optional<User> usr = userRepo.findById(id);
-        if(!usr.isPresent()){
+    public User updateUserPassword(UpdatePassword password) {
+        User usr = userRepo.findByEmail(password.getEmail());
+        if(usr == null){
             throw new EntityNotFoundException("User not Found");
         }
-        User user = usr.get();
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepo.save(user);
+    
+        if(!password.getPassword().equals(password.getConfirmPassword())){
+            throw new IllegalStateException("Password and Confirm Password Not match");
+        }
+        System.out.println("Password updated");
+        usr.setPassword(passwordEncoder.encode(password.getPassword()));
+        return userRepo.save(usr);
     }
 
     public User updateUserProfilePic(Long id, String profilePic) {
@@ -73,5 +86,25 @@ public class UserService {
     public Page<User> getAllUsers(int page, int size) {
         PageRequest pages = PageRequest.of(page, size);
         return userRepo.findAll(pages);
+    }
+
+   
+    public User validateUser(LoginDetails details) throws FailedLoginException{
+        User usr = userRepo.findByEmail(details.getEmail());
+        if(usr == null){
+            throw new EntityNotFoundException("User not found");
+        }
+        else if(!passwordEncoder.matches(details.getPassword(), usr.getPassword())){
+            throw new FailedLoginException("Invalid Password");
+        }
+        return usr;
+    }
+
+    public User verifyEmail(String email) {
+        User usr = userRepo.findByEmail(email);
+        if(usr == null){
+            throw new EntityNotFoundException("User not found");
+        }
+        return usr;
     }
 }

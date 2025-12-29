@@ -19,6 +19,7 @@ import com.example.task_manager_backend.Repository.UsersRepo;
 
 import jakarta.persistence.EntityNotFoundException;
 // import jakarta.validation.Valid;
+import jakarta.transaction.Transactional;
 
 @Service
 public class TaskService {
@@ -168,5 +169,73 @@ public class TaskService {
         tasks.setTrash(Trash.NOTTRASH);
         return taskRepo.save(tasks);
     }
+    @Transactional
+    public Long AlltaskCount(String email) {
+        User usr = userRepo.findByEmail(email);
+        if(usr == null){
+            throw new EntityNotFoundException("User not found with id " + email);
+        }
+        System.out.println(usr.getUsername());
+        Long tsk_cnt = taskRepo.countOfTask(usr.getUserId());
+        System.out.println(tsk_cnt);
+        return tsk_cnt;
+    }
+    @Transactional
+    public Integer AllCompletedCount(String email) {
+        User usr = userRepo.findByEmail(email);
+        // TaskStatus.
+        if(usr == null){
+            throw new EntityNotFoundException("User not found with email " + email);
+        }
+        // System.out.println(tskStatus+" first");
+        // TaskStatus value = TaskStatus.valueOf(tskStatus.toUpperCase());
+        // System.out.println(value+" converted "+usr.getUserId());
+        Integer tsk_cnt = taskRepo.countOfComplition(usr.getUserId(), TaskStatus.COMPLETED.name());
+        // System.out.println(tsk_cnt+" this actual value");
+        return tsk_cnt;
+    }
+    @Transactional
+    public Integer AllInProgressCount(String email) {
+        User usr = userRepo.findByEmail(email);
+        // TaskStatus.
+        if(usr == null){
+            throw new EntityNotFoundException("User not found with email " + email);
+        }
+        System.out.println(email+" first");
+        // TaskStatus value = TaskStatus.valueOf(tskStatus.toUpperCase());
+        // System.out.println(value+" converted "+usr.getUserId());
+        Integer tsk_cnt = taskRepo.countOfInProgress(usr.getUserId(), TaskStatus.INPROGRESS.name());
+        System.out.println(tsk_cnt+" this actual value");
+        return tsk_cnt;
+    }
 
+    @Transactional
+    public Integer AllDueToCount(String email) {
+        User usr = userRepo.findByEmail(email);
+        // TaskStatus.
+        if(usr == null){
+            throw new EntityNotFoundException("User not found with email " + email);
+        }
+        // System.out.println(tskStatus+" first");
+        // TaskStatus value = TaskStatus.valueOf(tskStatus.toUpperCase());
+        // System.out.println(value+" converted "+usr.getUserId());
+        Integer tsk_cnt = taskRepo.countOfTODO(usr.getUserId(), TaskStatus.TODO.name());
+        // System.out.println(tsk_cnt+" this actual value");
+        return tsk_cnt;
+    }
+
+    @Transactional
+    public Integer AllOverDueCount(String email) {
+        User usr = userRepo.findByEmail(email);
+        // TaskStatus.
+        if(usr == null){
+            throw new EntityNotFoundException("User not found with email " + email);
+        }
+        // System.out.println(tskStatus+" first");
+        // TaskStatus value = TaskStatus.valueOf(tskStatus.toUpperCase());
+        // System.out.println(value+" converted "+usr.getUserId());
+        Integer tsk_cnt = taskRepo.countOfOverDue(usr.getUserId(), TaskStatus.OVERDUE.name());
+        // System.out.println(tsk_cnt+" this actual value");
+        return tsk_cnt;
+    }
 }

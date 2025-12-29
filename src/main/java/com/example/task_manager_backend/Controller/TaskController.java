@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
+// import com.example.task_manager_backend.DTO.GetTaskCnt;
 import com.example.task_manager_backend.Entities.Tasks;
 import com.example.task_manager_backend.Service.TaskService;
 
@@ -111,4 +112,41 @@ public class TaskController {
       
         return new ResponseEntity<>(tsk,HttpStatus.OK);
     }
+
+    @GetMapping("/allTask/count")
+    @Operation(summary = "Get count of all tasks")
+    public ResponseEntity<Long> tasksCount(@RequestParam String email){
+        // System.out.println(email+" Email bro");
+        Long tsk_cnt = taskService.AlltaskCount(email);
+        return new ResponseEntity<>(tsk_cnt, HttpStatus.OK);
+    }
+
+    @GetMapping("/completedTask/count")
+    @Operation(summary = "Get count of all completed task")
+    public ResponseEntity<Integer> completedCount(@RequestParam String email){
+        Integer  tsk_cnt = taskService.AllCompletedCount(email);
+        return new ResponseEntity<>(tsk_cnt, HttpStatus.OK);
+    }
+
+    @GetMapping("/inprogressCount/count")
+    @Operation(summary = "Get count of all in progress task")
+    public ResponseEntity<Integer> inProgressCount(@RequestParam String email){
+        Integer  tsk_cnt = taskService.AllInProgressCount(email);
+        return new ResponseEntity<>(tsk_cnt, HttpStatus.OK);
+    }
+
+    @GetMapping("/todo/count")
+    @Operation(summary = "Get count of all to-do task")
+    public ResponseEntity<Integer> dueToCount(@RequestParam String email){
+        Integer  tsk_cnt = taskService.AllDueToCount(email);
+        return new ResponseEntity<>(tsk_cnt, HttpStatus.OK);
+    }
+
+    @GetMapping("/overDueCount/count")
+    @Operation(summary = "Get count of all over-due count task")
+    public ResponseEntity<Integer> overDueCount(@RequestParam String email){
+        Integer  tsk_cnt = taskService.AllOverDueCount(email);
+        return new ResponseEntity<>(tsk_cnt, HttpStatus.OK);
+    }
+
 }

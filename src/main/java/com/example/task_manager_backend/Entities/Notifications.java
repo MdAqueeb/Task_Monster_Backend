@@ -53,4 +53,7 @@ public class Notifications {
     @ManyToOne
     @JoinColumn(name = "userId",nullable = false)
     private User user;
+
+
+    // task
 }

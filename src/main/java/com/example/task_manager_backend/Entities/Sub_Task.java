@@ -11,16 +11,19 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="SubTask")
 @NoArgsConstructor
 @Builder
+@Data
 @AllArgsConstructor
 public class Sub_Task {
     @Id
@@ -35,13 +38,13 @@ public class Sub_Task {
     @NotBlank
     private String subTaskDescription;
 
-    @Builder.Default
+    // @Builder.Default
     @Column(name="sub_task_Created_At", nullable = false)
-    private LocalDateTime subTaskCreatedAt= LocalDateTime.now();
+    private LocalDateTime subTaskCreatedAt;
 
     @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private SubTaskStatus notificationStatus=SubTaskStatus.INPROGRESS;
+    // @Builder.Default
+    private SubTaskStatus subTaskStatus;
 
     enum SubTaskStatus{
         INPROGRESS, COMPLETED
@@ -54,4 +57,10 @@ public class Sub_Task {
     @ManyToOne
     @JoinColumn(name = "userId",nullable = false)
     private User user;
+
+    @PrePersist
+    void defaulValues(){
+        subTaskCreatedAt = LocalDateTime.now();
+        subTaskStatus = SubTaskStatus.INPROGRESS;
+    }
 }
